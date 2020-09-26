@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"log"
 	"strings"
 
 	"github.com/badoux/checkmail"
@@ -123,4 +124,34 @@ func (u *User) FindUserByID(db *gorm.DB, id int) (*User, error) {
 		return &User{}, errors.New("User Not Found")
 	}
 	return u, err
+}
+
+// UpdateUser overwrite user's date
+func (u *User) UpdateUser(db *gorm.DB, id int) (*User, error) {
+	err := u.BeforeSave()
+	if err != nil {
+		log.Fatal(err)
+	}
+	db = db.Debug().Model(&User{}).Where("id = ?", id).Take(&User{}).UpdateColumns(
+		map[string]interface{}{
+			"password": u.Password,
+			"name":     u.Name,
+			"surname":  u.Surname,
+			"email":    u.Email,
+		},
+	)
+	if db.Error != nil {
+		return &User{}, err
+	}
+	return u, nil
+}
+
+// DeleteUser delats user from DB
+func (u *User) DeleteUser(db *gorm.DB, id int) (int64, error) {
+	db = db.Debug().Model(&User{}).Where("id = ?", id).Take(&User{}).Delete(&User{})
+
+	if db.Error != nil {
+		return 0, db.Error
+	}
+	return db.RowsAffected, nil
 }
