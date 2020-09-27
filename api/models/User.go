@@ -38,7 +38,7 @@ func (u *User) BeforeSave() error {
 	return nil
 }
 
-// Prepare func delats user input of any white space
+// Prepare func removes user input of any white space
 func (u *User) Prepare() {
 	u.ID = 0
 	u.Name = strings.TrimSpace(u.Name)
@@ -146,7 +146,7 @@ func (u *User) UpdateUser(db *gorm.DB, id int) (*User, error) {
 	return u, nil
 }
 
-// DeleteUser delats user from DB
+// DeleteUser removes user from DB
 func (u *User) DeleteUser(db *gorm.DB, id int) (int64, error) {
 	db = db.Debug().Model(&User{}).Where("id = ?", id).Take(&User{}).Delete(&User{})
 
