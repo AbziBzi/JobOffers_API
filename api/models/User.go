@@ -38,7 +38,7 @@ func (u *User) BeforeSave() error {
 	return nil
 }
 
-// Prepare delats user input of any white space
+// Prepare func delats user input of any white space
 func (u *User) Prepare() {
 	u.ID = 0
 	u.Name = strings.TrimSpace(u.Name)
