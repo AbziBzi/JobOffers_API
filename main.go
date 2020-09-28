@@ -1,7 +1,7 @@
 package main
 
-import "fmt"
+import "github.com/abzibzi/jobOfferts_API/api"
 
 func main() {
-	fmt.Println("Hello World")
+	api.Run()
 }

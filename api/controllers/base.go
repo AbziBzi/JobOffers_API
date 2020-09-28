@@ -8,6 +8,7 @@ import (
 	"github.com/abzibzi/jobOfferts_API/api/models"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres" //postgres
 )
 
 // Server structure with references to the
@@ -20,14 +21,13 @@ type Server struct {
 // Initialize connect to the database and wire up routes
 func (server *Server) Initialize(DbHost, DbPort, DbUser, DbName, DbPassword string) {
 	var err error
-	DBURL := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s", DbHost, DbPort, DbUser, DbName, DbPassword)
-
+	DBURL := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable", DbHost, DbPort, DbUser, DbName, DbPassword)
 	server.DB, err = gorm.Open("postgres", DBURL)
 	if err != nil {
-		fmt.Printf("\n Cannot connect to database %s", DbName)
-		log.Fatal("This is the error:", err)
+		fmt.Printf("\nCannot connect to database %s:%s ", DbName, DbPort)
+		log.Fatal("\nThis is the error:", err)
 	} else {
-		fmt.Printf("We are connected to the database %s", DbName)
+		fmt.Printf("We are connected to the database %s ", DbName)
 	}
 
 	server.DB.Debug().AutoMigrate(&models.User{}) //database migration
@@ -36,8 +36,8 @@ func (server *Server) Initialize(DbHost, DbPort, DbUser, DbName, DbPassword stri
 	server.initializeRoutes()
 }
 
-// RunServer runs server on port :3030
-func (server *Server) RunServer() {
-	log.Printf("\nServer starting on port 3030")
-	log.Fatal(http.ListenAndServe(":3030", server.Router))
+// RunServer runs server on given port
+func (server *Server) RunServer(port string) {
+	log.Printf("\nServer starting on port %s", port)
+	log.Fatal(http.ListenAndServe(port, server.Router))
 }
