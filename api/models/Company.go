@@ -30,6 +30,7 @@ func (c *Company) Prepare() {
 		socialMedia = append(socialMedia, strings.TrimSpace(mediaLink))
 	}
 	c.SocialMedia = socialMedia
+	c.Type = Type{}
 }
 
 // Validate func checks if given data is valid

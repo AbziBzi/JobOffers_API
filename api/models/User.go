@@ -46,8 +46,7 @@ func (u *User) Prepare() {
 	u.Email = strings.TrimSpace(u.Email)
 }
 
-// Validate method checks for id given data by user
-// is validate
+// Validate method checks given data
 func (u *User) Validate(action string) error {
 	switch strings.ToLower(action) {
 	case "update":
