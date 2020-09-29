@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/abzibzi/jobOfferts_API/api/controllers"
+	"github.com/abzibzi/jobOffers_API/api/controllers"
 	"github.com/joho/godotenv"
 )
 

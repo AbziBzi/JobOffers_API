@@ -3,8 +3,8 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/abzibzi/jobOfferts_API/api/models"
-	"github.com/abzibzi/jobOfferts_API/api/responses"
+	"github.com/abzibzi/jobOffers_API/api/models"
+	"github.com/abzibzi/jobOffers_API/api/responses"
 )
 
 // GetUsers return all Users from DB

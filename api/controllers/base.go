@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/abzibzi/jobOfferts_API/api/models"
+	"github.com/abzibzi/jobOffers_API/api/models"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" //postgres

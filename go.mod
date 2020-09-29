@@ -1,8 +1,9 @@
-module github.com/abzibzi/jobOfferts_API
+module github.com/abzibzi/jobOffers_API
 
 go 1.15
 
 require (
+	github.com/abzibzi/jobOfferts_API v0.0.0-20200928121253-c512818f6a1f
 	github.com/badoux/checkmail v1.2.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gorilla/mux v1.8.0

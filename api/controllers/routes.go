@@ -1,10 +1,9 @@
 package controllers
 
-import "github.com/peterwade153/ivents/api/middlewares"
+import "github.com/abzibzi/jobOffers_API/api/middlewares"
 
 func (s *Server) initializeRoutes() {
-	s.Router.Use(middlewares.SetContentTypeMiddleware)
 
 	// User routes
-	s.Router.HandleFunc("/api/users", s.GetUsers).Methods("GET")
+	s.Router.HandleFunc("/api/users", middlewares.SetMiddlewareJSON(s.GetUsers)).Methods("GET")
 }
