@@ -5,18 +5,20 @@ import (
 	"strings"
 
 	"github.com/jinzhu/gorm"
+	"github.com/lib/pq"
 )
 
 // Company structure
 type Company struct {
-	ID           int      `gorm:"primary_key;auto_increment" json:"id"`
-	Name         string   `gorm:"size:255;not null;unique" json:"name"`
-	Size         int      `gorm:"not null" json:"size"`
-	Industry     string   `gorm:"size:255; not null" json:"industry"`
-	Headquarters string   `gorm:"size:255;not null" json:"headquarters"`
-	SocialMedia  []string `json:"social_media"`
-	TypeID       int      `gorm:"not null" json:"type"`
-	Type         Type     `json:"company_type"`
+	ID           int            `gorm:"primary_key;auto_increment" json:"id"`
+	Name         string         `gorm:"size:255;not null;unique" json:"name"`
+	Size         int            `gorm:"not null" json:"size"`
+	Industry     string         `gorm:"size:255; not null" json:"industry"`
+	Headquarters string         `gorm:"size:255;not null" json:"headquarters"`
+	SocialMedia  pq.StringArray `gorm:"type:text[]" json:"social_media"`
+	TypeID       int            `gorm:"not null" json:"typeID"`
+	Type         CompanyType    `gorm:"foreignKey:TypeID" json:"company_type"`
+	// Technologies []Technology   `gorm:"many2many:companytechnologies" json:"technologies"`
 }
 
 // Prepare func removes all white space before saving
@@ -30,7 +32,7 @@ func (c *Company) Prepare() {
 		socialMedia = append(socialMedia, strings.TrimSpace(mediaLink))
 	}
 	c.SocialMedia = socialMedia
-	c.Type = Type{}
+	c.Type = CompanyType{}
 }
 
 // Validate func checks if given data is valid
@@ -61,7 +63,7 @@ func (c *Company) SaveCompany(db *gorm.DB) (*Company, error) {
 		return &Company{}, err
 	}
 	if c.ID != 0 {
-		err = db.Debug().Model(&Type{}).Where("id = ?", c.TypeID).Take(&c.Type).Error
+		err = db.Debug().Model(&CompanyType{}).Where("id = ?", c.TypeID).Take(&c.Type).Error
 		if err != nil {
 			return &Company{}, err
 		}
@@ -73,13 +75,13 @@ func (c *Company) SaveCompany(db *gorm.DB) (*Company, error) {
 func (c *Company) FindAllCompanies(db *gorm.DB) (*[]Company, error) {
 	var err error
 	companies := []Company{}
-	err = db.Debug().Model(&Company{}).Find(&companies).Error
+	err = db.Debug().Model(&Company{}).Preload("companytype").Find(&companies).Error
 	if err != nil {
 		return &[]Company{}, err
 	}
 	if len(companies) > 0 {
 		for i := range companies {
-			err := db.Debug().Model(&Type{}).Where("id = ?", companies[i].TypeID).Take(&companies[i].Type).Error
+			err := db.Debug().Model(&CompanyType{}).Where("id = ?", companies[i].TypeID).Take(&companies[i].Type).Error
 			if err != nil {
 				return &[]Company{}, err
 			}
@@ -96,7 +98,7 @@ func (c *Company) FindCompanyByID(db *gorm.DB, id int) (*Company, error) {
 		return &Company{}, err
 	}
 	if c.ID != 0 {
-		err = db.Debug().Model(&Type{}).Where("id = ?", c.TypeID).Take(&c.Type).Error
+		err = db.Debug().Model(&CompanyType{}).Where("id = ?", c.TypeID).Take(&c.Type).Error
 		if err != nil {
 			return &Company{}, err
 		}
@@ -119,7 +121,7 @@ func (c *Company) UpdateCompany(db *gorm.DB) (*Company, error) {
 		return &Company{}, err
 	}
 	if c.ID != 0 {
-		err = db.Debug().Model(&Type{}).Where("id = ?", c.TypeID).Take(&c.Type).Error
+		err = db.Debug().Model(&CompanyType{}).Where("id = ?", c.TypeID).Take(&c.Type).Error
 		if err != nil {
 			return &Company{}, err
 		}

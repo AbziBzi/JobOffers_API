@@ -25,6 +25,11 @@ func Hash(password string) ([]byte, error) {
 	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 }
 
+// VerifyPassword verifies user password
+func VerifyPassword(hashedPassword, password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+}
+
 // BeforeSave method changes user password to hashed one
 // This func should be performet before saving to database
 // otherwise password will be saved not hashed
@@ -56,6 +61,9 @@ func (u *User) Validate(action string) error {
 		if u.Surname == "" {
 			return errors.New("Required Surname")
 		}
+		if u.Password == "" {
+			return errors.New("Required Password")
+		}
 		if u.Email == "" {
 			return errors.New("Required Email")
 		}
@@ -80,6 +88,9 @@ func (u *User) Validate(action string) error {
 		}
 		if u.Surname == "" {
 			return errors.New("Required Surname")
+		}
+		if u.Password == "" {
+			return errors.New("Required Password")
 		}
 		if u.Email == "" {
 			return errors.New("Required Email")
