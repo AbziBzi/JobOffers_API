@@ -12,4 +12,7 @@ func (s *Server) initializeRoutes() {
 	s.Router.HandleFunc("/api/users", middlewares.SetMiddlewareJSON(s.CreateUser)).Methods("POST")
 	s.Router.HandleFunc("/api/users/{id}", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareAuthentication(s.UpdateUser))).Methods("PUT")
 	s.Router.HandleFunc("/api/users/{id}", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareAuthentication(s.DeleteUser))).Methods("DELETE")
+
+	// Company routes
+	s.Router.HandleFunc("/api/companies/{id}", middlewares.SetMiddlewareJSON(s.GetCompany)).Methods("GET")
 }
