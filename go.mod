@@ -9,6 +9,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/joho/godotenv v1.3.0
+	github.com/lib/pq v1.1.1
 	github.com/peterwade153/ivents v0.0.0-20191202144600-4a825e64038b
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 )

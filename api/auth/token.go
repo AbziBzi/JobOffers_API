@@ -27,7 +27,9 @@ func CreateToken(userID int) (string, error) {
 // TokenValid checks if given token is valid
 func TokenValid(r *http.Request) error {
 	tokenString := ExtractToken(r)
+	fmt.Println(tokenString)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		fmt.Println(token)
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
@@ -57,7 +59,7 @@ func ExtractToken(r *http.Request) string {
 }
 
 // ExtractTokenID extracts token ID
-func ExtractTokenID(r *http.Request) (uint32, error) {
+func ExtractTokenID(r *http.Request) (int, error) {
 
 	tokenString := ExtractToken(r)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -71,16 +73,20 @@ func ExtractTokenID(r *http.Request) (uint32, error) {
 	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if ok && token.Valid {
-		uid, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["user_id"]), 10, 32)
+		a := claims["userID"]
+		fmt.Println(a)
+		b := fmt.Sprintf("%.0f", a)
+		fmt.Println(b)
+		id, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["userID"]), 10, 32)
 		if err != nil {
 			return 0, err
 		}
-		return uint32(uid), nil
+		return int(id), nil
 	}
 	return 0, nil
 }
 
-//Pretty display the claims licely in the terminal
+//Pretty display the claims nicely in the terminal
 func Pretty(data interface{}) {
 	b, err := json.MarshalIndent(data, "", " ")
 	if err != nil {
