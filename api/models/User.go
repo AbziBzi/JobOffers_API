@@ -17,6 +17,8 @@ type User struct {
 	Surname  string `gorm:"size:100;not null" json:"surname"`
 	Email    string `gorm:"size:255;not null;unique" json:"email"`
 	Password string `gorm:"size:100;not null" json:"password"`
+	RoleID   int    `gorm:"not null" json:"role_id"`
+	Role     Role   `gorm:"foreignKey:RoleID" json:"role"`
 }
 
 // Hash method is hashing user password
@@ -49,6 +51,7 @@ func (u *User) Prepare() {
 	u.Name = strings.TrimSpace(u.Name)
 	u.Surname = strings.TrimSpace(u.Surname)
 	u.Email = strings.TrimSpace(u.Email)
+	u.Role = Role{}
 }
 
 // Validate method checks given data
@@ -98,6 +101,9 @@ func (u *User) Validate(action string) error {
 		if err := checkmail.ValidateFormat(u.Email); err != nil {
 			return errors.New("Invalid Email")
 		}
+		if u.RoleID < 0 {
+			return errors.New("Invalid Role")
+		}
 		return nil
 	}
 }
@@ -105,9 +111,15 @@ func (u *User) Validate(action string) error {
 // SaveUser method saves user to DB
 func (u *User) SaveUser(db *gorm.DB) (*User, error) {
 	var err error
-	err = db.Debug().Create(&u).Error
+	err = db.Debug().Model(&User{}).Create(&u).Error
 	if err != nil {
 		return &User{}, err
+	}
+	if u.ID != 0 {
+		err = db.Debug().Model(&Role{}).Where("id = ?", u.RoleID).Take(&u.Role).Error
+		if err != nil {
+			return &User{}, err
+		}
 	}
 	return u, nil
 }
@@ -120,6 +132,14 @@ func (u *User) FindAllUsers(db *gorm.DB) (*[]User, error) {
 	if err != nil {
 		return &[]User{}, err
 	}
+	if len(users) > 0 {
+		for i := range users {
+			err := db.Debug().Model(&Role{}).Where("id = ?", users[i].RoleID).Take(&users[i].Role).Error
+			if err != nil {
+				return &[]User{}, err
+			}
+		}
+	}
 	return &users, err
 }
 
@@ -127,11 +147,17 @@ func (u *User) FindAllUsers(db *gorm.DB) (*[]User, error) {
 func (u *User) FindUserByID(db *gorm.DB, id int) (*User, error) {
 	var err error
 	err = db.Debug().Model(&User{}).Where("id = ?", id).Take(&u).Error
+	if gorm.IsRecordNotFoundError(err) {
+		return &User{}, errors.New("User Not Found")
+	}
 	if err != nil {
 		return &User{}, err
 	}
-	if gorm.IsRecordNotFoundError(err) {
-		return &User{}, errors.New("User Not Found")
+	if u.ID != 0 {
+		err := db.Debug().Model(&Role{}).Where("id = ?", u.RoleID).Take(&u.Role).Error
+		if err != nil {
+			return &User{}, err
+		}
 	}
 	return u, err
 }
@@ -153,6 +179,12 @@ func (u *User) UpdateUser(db *gorm.DB, id int) (*User, error) {
 	if db.Error != nil {
 		return &User{}, err
 	}
+	if u.ID != 0 {
+		err := db.Debug().Model(&Role{}).Where("id = ?", u.RoleID).Take(&u.Role).Error
+		if err != nil {
+			return &User{}, err
+		}
+	}
 	return u, nil
 }
 
@@ -161,6 +193,9 @@ func (u *User) DeleteUser(db *gorm.DB, id int) (int64, error) {
 	db = db.Debug().Model(&User{}).Where("id = ?", id).Take(&User{}).Delete(&User{})
 
 	if db.Error != nil {
+		if gorm.IsRecordNotFoundError(db.Error) {
+			return 0, errors.New("User not found")
+		}
 		return 0, db.Error
 	}
 	return db.RowsAffected, nil

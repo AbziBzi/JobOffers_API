@@ -10,15 +10,17 @@ import (
 
 // Company structure
 type Company struct {
-	ID           int            `gorm:"primary_key;auto_increment" json:"id"`
-	Name         string         `gorm:"size:255;not null;unique" json:"name"`
-	Size         int            `gorm:"not null" json:"size"`
-	Industry     string         `gorm:"size:255; not null" json:"industry"`
-	Headquarters string         `gorm:"size:255;not null" json:"headquarters"`
-	SocialMedia  pq.StringArray `gorm:"type:text[]" json:"social_media"`
-	TypeID       int            `gorm:"not null" json:"typeID"`
-	Type         CompanyType    `gorm:"foreignKey:TypeID" json:"company_type"`
-	// Technologies []Technology   `gorm:"many2many:companytechnologies" json:"technologies"`
+	ID            int            `gorm:"primary_key;auto_increment" json:"id"`
+	Name          string         `gorm:"size:255;not null;unique" json:"name"`
+	Size          int            `gorm:"not null" json:"size"`
+	Industry      string         `gorm:"size:255; not null" json:"industry"`
+	Headquarters  string         `gorm:"size:255;not null" json:"headquarters"`
+	SocialMedia   pq.StringArray `gorm:"type:text[]" json:"social_media"`
+	TypeID        int            `gorm:"not null" json:"typeID"`
+	Type          CompanyType    `gorm:"foreignKey:TypeID" json:"company_type"`
+	Technologies  []Technology   `gorm:"many2many:company_technologies" json:"technologies"`
+	UserID        int            `gorm:"not null unique" json:"user_id"`
+	Administrator User           `gorm:"foreignKey:UserID" json:"company_administrator"`
 }
 
 // Prepare func removes all white space before saving
@@ -32,7 +34,11 @@ func (c *Company) Prepare() {
 		socialMedia = append(socialMedia, strings.TrimSpace(mediaLink))
 	}
 	c.SocialMedia = socialMedia
+	c.TypeID = 0
 	c.Type = CompanyType{}
+	c.Technologies = []Technology{}
+	c.UserID = 0
+	c.Administrator = User{}
 }
 
 // Validate func checks if given data is valid
@@ -51,6 +57,9 @@ func (c *Company) Validate() error {
 	}
 	if c.TypeID < 1 {
 		return errors.New("Required Type")
+	}
+	if c.UserID < 1 {
+		return errors.New("Required UserID")
 	}
 	return nil
 }
@@ -81,7 +90,15 @@ func (c *Company) FindAllCompanies(db *gorm.DB) (*[]Company, error) {
 	}
 	if len(companies) > 0 {
 		for i := range companies {
-			err := db.Debug().Model(&CompanyType{}).Where("id = ?", companies[i].TypeID).Take(&companies[i].Type).Error
+			err = db.Debug().Model(&CompanyType{}).Where("id = ?", companies[i].TypeID).Take(&companies[i].Type).Error
+			if err != nil {
+				return &[]Company{}, err
+			}
+			err = db.Debug().Model(&User{}).Where("id = ?", companies[i].UserID).Take(&companies[i].Administrator).Error
+			if err != nil {
+				return &[]Company{}, err
+			}
+			err = db.Debug().Model(&c).Related(&c.Technologies, "Technologies").Error
 			if err != nil {
 				return &[]Company{}, err
 			}
@@ -99,6 +116,14 @@ func (c *Company) FindCompanyByID(db *gorm.DB, id int) (*Company, error) {
 	}
 	if c.ID != 0 {
 		err = db.Debug().Model(&CompanyType{}).Where("id = ?", c.TypeID).Take(&c.Type).Error
+		if err != nil {
+			return &Company{}, err
+		}
+		err = db.Debug().Model(&User{}).Where("id = ?", c.UserID).Take(&c.Administrator).Error
+		if err != nil {
+			return &Company{}, err
+		}
+		err = db.Debug().Model(&c).Related(&c.Technologies, "Technologies").Error
 		if err != nil {
 			return &Company{}, err
 		}
