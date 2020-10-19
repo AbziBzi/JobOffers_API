@@ -15,4 +15,6 @@ func (s *Server) initializeRoutes() {
 
 	// Company routes
 	s.Router.HandleFunc("/api/companies/{id}", middlewares.SetMiddlewareJSON(s.GetCompany)).Methods("GET")
+	s.Router.HandleFunc("/api/companies", middlewares.SetMiddlewareJSON(s.GetCompanies)).Methods("GET")
+	s.Router.HandleFunc("/api/companies", middlewares.SetMiddlewareJSON(s.CreateCompany)).Methods("POST")
 }

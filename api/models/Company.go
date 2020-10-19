@@ -34,10 +34,8 @@ func (c *Company) Prepare() {
 		socialMedia = append(socialMedia, strings.TrimSpace(mediaLink))
 	}
 	c.SocialMedia = socialMedia
-	c.TypeID = 0
 	c.Type = CompanyType{}
 	c.Technologies = []Technology{}
-	c.UserID = 0
 	c.Administrator = User{}
 }
 
@@ -76,6 +74,14 @@ func (c *Company) SaveCompany(db *gorm.DB) (*Company, error) {
 		if err != nil {
 			return &Company{}, err
 		}
+		err = db.Debug().Model(&User{}).Where("id = ?", c.UserID).Take(&c.Administrator).Error
+		if err != nil {
+			return &Company{}, err
+		}
+		err = db.Debug().Model(&c).Related(&c.Technologies, "Technologies").Error
+		if err != nil {
+			return &Company{}, err
+		}
 	}
 	return c, nil
 }
@@ -84,7 +90,7 @@ func (c *Company) SaveCompany(db *gorm.DB) (*Company, error) {
 func (c *Company) FindAllCompanies(db *gorm.DB) (*[]Company, error) {
 	var err error
 	companies := []Company{}
-	err = db.Debug().Model(&Company{}).Preload("companytype").Find(&companies).Error
+	err = db.Debug().Model(&Company{}).Find(&companies).Error
 	if err != nil {
 		return &[]Company{}, err
 	}
@@ -98,7 +104,7 @@ func (c *Company) FindAllCompanies(db *gorm.DB) (*[]Company, error) {
 			if err != nil {
 				return &[]Company{}, err
 			}
-			err = db.Debug().Model(&c).Related(&c.Technologies, "Technologies").Error
+			err = db.Debug().Model(&companies[i]).Related(&companies[i].Technologies, "Technologies").Error
 			if err != nil {
 				return &[]Company{}, err
 			}

@@ -2,11 +2,13 @@ package controllers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 
+	"github.com/abzibzi/jobOffers_API/api/auth"
 	"github.com/abzibzi/jobOffers_API/api/models"
 	"github.com/abzibzi/jobOffers_API/api/responses"
 	"github.com/gorilla/mux"
@@ -46,6 +48,7 @@ func (server *Server) CreateCompany(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
 	}
 	company := models.Company{}
 	err = json.Unmarshal(body, &company)
@@ -57,6 +60,25 @@ func (server *Server) CreateCompany(w http.ResponseWriter, r *http.Request) {
 	err = company.Validate()
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+	userID, err := auth.ExtractTokenID(r)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized. Wrong token"))
+		return
+	}
+	if userID != company.UserID {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New(http.StatusText(http.StatusUnauthorized)))
+		return
+	}
+	user := models.User{}
+	admin, err := user.FindUserByID(server.DB, userID)
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, err)
+		return
+	}
+	if admin.RoleID != 2 {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized. User is a developer"))
 		return
 	}
 	companyCreated, err := company.SaveCompany(server.DB)
