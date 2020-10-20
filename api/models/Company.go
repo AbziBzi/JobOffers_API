@@ -172,7 +172,6 @@ func (c *Company) UpdateCompany(db *gorm.DB) (*Company, error) {
 // DeleteCompany removes company object from DB
 func (c *Company) DeleteCompany(db *gorm.DB, id int) (int64, error) {
 	db = db.Debug().Model(&Company{}).Where("id = ?", id).Take(&Company{}).Delete(&Company{})
-
 	if db.Error != nil {
 		if gorm.IsRecordNotFoundError(db.Error) {
 			return 0, errors.New("Company not found")

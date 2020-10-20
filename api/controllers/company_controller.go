@@ -139,5 +139,32 @@ func (server *Server) UpdateCompany(w http.ResponseWriter, r *http.Request) {
 
 // DeleteCompany removes company from DB
 func (server *Server) DeleteCompany(w http.ResponseWriter, r *http.Request) {
-
+	vars := mux.Vars(r)
+	companyID, err := strconv.ParseUint(vars["id"], 10, 64)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	userID, err := auth.ExtractTokenID(r)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
+		return
+	}
+	company := models.Company{}
+	companyGotten, err := company.FindCompanyByID(server.DB, int(companyID))
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, errors.New("Company not found"))
+		return
+	}
+	if userID != companyGotten.UserID {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized. UserID does not match the company admin ID"))
+		return
+	}
+	_, err = companyGotten.DeleteCompany(server.DB, int(companyID))
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	w.Header().Set("Entity", fmt.Sprintf("%d", companyID))
+	responses.JSON(w, http.StatusNoContent, "")
 }
