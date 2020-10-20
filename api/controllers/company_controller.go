@@ -92,33 +92,52 @@ func (server *Server) CreateCompany(w http.ResponseWriter, r *http.Request) {
 
 // UpdateCompany func updates existing company data
 func (server *Server) UpdateCompany(w http.ResponseWriter, r *http.Request) {
-	// vars := mux.Vars(r)
-	// id, err := strconv.ParseUint(vars["id"], 10, 32)
-	// if err != nil {
-	// 	responses.ERROR(w, http.StatusBadRequest, err)
-	// 	return
-	// }
+	vars := mux.Vars(r)
+	companyID, err := strconv.ParseUint(vars["id"], 10, 32)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	userID, err := auth.ExtractTokenID(r)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
+		return
+	}
+	company := models.Company{}
+	companyGotten, err := company.FindCompanyByID(server.DB, int(companyID))
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, errors.New("Company not found"))
+		return
+	}
+	if userID != companyGotten.UserID {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized. User do not own company"))
+		return
+	}
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	company := models.Company{}
-	err = json.Unmarshal(body, &company)
+	companyUpdate := models.Company{}
+	err = json.Unmarshal(body, &companyUpdate)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	company.Prepare()
-	err = company.Validate()
-	if err != nil {
-		responses.ERROR(w, http.StatusUnprocessableEntity, err)
+	if userID != companyUpdate.UserID {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized. UserID given in the body does not match company administrator ID"))
 		return
 	}
-	updatedCompany, err := company.UpdateCompany(server.DB)
+	companyUpdate.ID = companyGotten.ID
+	companyUpdated, err := companyUpdate.UpdateCompany(server.DB)
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
 	}
-	responses.JSON(w, http.StatusOK, updatedCompany)
+	responses.JSON(w, http.StatusOK, companyUpdated)
+}
+
+// DeleteCompany removes company from DB
+func (server *Server) DeleteCompany(w http.ResponseWriter, r *http.Request) {
+
 }

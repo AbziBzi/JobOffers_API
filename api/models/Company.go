@@ -147,12 +147,21 @@ func (c *Company) UpdateCompany(db *gorm.DB) (*Company, error) {
 		Headquarters: c.Headquarters,
 		SocialMedia:  c.SocialMedia,
 		TypeID:       c.TypeID,
+		UserID:       c.UserID,
 	}).Error
 	if err != nil {
 		return &Company{}, err
 	}
 	if c.ID != 0 {
 		err = db.Debug().Model(&CompanyType{}).Where("id = ?", c.TypeID).Take(&c.Type).Error
+		if err != nil {
+			return &Company{}, err
+		}
+		err = db.Debug().Model(&User{}).Where("id = ?", c.UserID).Take(&c.Administrator).Error
+		if err != nil {
+			return &Company{}, err
+		}
+		err = db.Debug().Model(&c).Related(&c.Technologies, "Technologies").Error
 		if err != nil {
 			return &Company{}, err
 		}
