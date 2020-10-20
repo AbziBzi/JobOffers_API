@@ -21,6 +21,7 @@ type Company struct {
 	Technologies  []Technology   `gorm:"many2many:company_technologies" json:"technologies"`
 	UserID        int            `gorm:"not null unique" json:"user_id"`
 	Administrator User           `gorm:"foreignKey:UserID" json:"company_administrator"`
+	Offices       []Office       `gorm:"foreignKey:CompanyID" json:"offices"`
 }
 
 // Prepare func removes all white space before saving
@@ -62,7 +63,7 @@ func (c *Company) Validate() error {
 	return nil
 }
 
-// SaveCompany fun saves company to DB
+// SaveCompany func saves company to DB
 func (c *Company) SaveCompany(db *gorm.DB) (*Company, error) {
 	var err error
 	err = db.Debug().Model(&Company{}).Create(&c).Error
