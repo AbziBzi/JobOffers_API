@@ -80,9 +80,9 @@ func (o *Office) FindOfficeByID(db *gorm.DB, id int) (*Office, error) {
 }
 
 // UpdateOffice updates office data
-func (o *Office) UpdateOffice(db *gorm.DB, id int) (*Office, error) {
+func (o *Office) UpdateOffice(db *gorm.DB) (*Office, error) {
 	var err error
-	err = db.Debug().Model(&Office{}).Where("id = ?", id).Updates(Office{
+	err = db.Debug().Model(&Office{}).Where("id = ?", o.ID).Updates(Office{
 		Country:    o.Country,
 		City:       o.City,
 		ZipCode:    o.ZipCode,
@@ -93,7 +93,7 @@ func (o *Office) UpdateOffice(db *gorm.DB, id int) (*Office, error) {
 	if err != nil {
 		return &Office{}, err
 	}
-	err = db.Debug().Model(&Office{}).Where("id = ?", id).Take(&o).Error
+	err = db.Debug().Model(&Office{}).Where("id = ?", o.ID).Take(&o).Error
 	if err != nil {
 		return &Office{}, err
 	}

@@ -34,7 +34,6 @@ func (server *Server) GetCompany(w http.ResponseWriter, r *http.Request) {
 // GetCompanies func gets all companies from DB
 func (server *Server) GetCompanies(w http.ResponseWriter, r *http.Request) {
 	company := models.Company{}
-
 	companies, err := company.FindAllCompanies(server.DB)
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)

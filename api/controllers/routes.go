@@ -19,4 +19,14 @@ func (s *Server) initializeRoutes() {
 	s.Router.HandleFunc("/api/companies", middlewares.SetMiddlewareJSON(s.CreateCompany)).Methods("POST")
 	s.Router.HandleFunc("/api/companies/{id}", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareAuthentication(s.UpdateCompany))).Methods("PUT")
 	s.Router.HandleFunc("/api/companies/{id}", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareAuthentication(s.DeleteCompany))).Methods("DELETE")
+
+	// Office routes
+	s.Router.HandleFunc("/api/offices/{id}", middlewares.SetMiddlewareJSON(s.GetOffice)).Methods("GET")
+	s.Router.HandleFunc("/api/offices", middlewares.SetMiddlewareJSON(s.GetOffices)).Methods("GET")
+	s.Router.HandleFunc("/api/offices", middlewares.SetMiddlewareJSON(s.CreateOffice)).Methods("POST")
+	s.Router.HandleFunc("/api/offices/{id}", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareAuthentication(s.UpdateOffice))).Methods("PUT")
+	s.Router.HandleFunc("/api/offices/{id}", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareAuthentication(s.DeleteOffice))).Methods("DELETE")
+
+	// Job offers routes
+
 }

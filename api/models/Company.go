@@ -83,6 +83,10 @@ func (c *Company) SaveCompany(db *gorm.DB) (*Company, error) {
 		if err != nil {
 			return &Company{}, err
 		}
+		err = db.Debug().Model(&c).Related(&c.Offices, "Offices").Error
+		if err != nil {
+			return &Company{}, err
+		}
 	}
 	return c, nil
 }
@@ -109,6 +113,10 @@ func (c *Company) FindAllCompanies(db *gorm.DB) (*[]Company, error) {
 			if err != nil {
 				return &[]Company{}, err
 			}
+			err = db.Debug().Model(&companies[i]).Related(&companies[i].Offices, "Offices").Error
+			if err != nil {
+				return &[]Company{}, err
+			}
 		}
 	}
 	return &companies, nil
@@ -131,6 +139,10 @@ func (c *Company) FindCompanyByID(db *gorm.DB, id int) (*Company, error) {
 			return &Company{}, err
 		}
 		err = db.Debug().Model(&c).Related(&c.Technologies, "Technologies").Error
+		if err != nil {
+			return &Company{}, err
+		}
+		err = db.Debug().Model(&c).Related(&c.Offices, "Offices").Error
 		if err != nil {
 			return &Company{}, err
 		}
@@ -163,6 +175,10 @@ func (c *Company) UpdateCompany(db *gorm.DB) (*Company, error) {
 			return &Company{}, err
 		}
 		err = db.Debug().Model(&c).Related(&c.Technologies, "Technologies").Error
+		if err != nil {
+			return &Company{}, err
+		}
+		err = db.Debug().Model(&c).Related(&c.Offices, "Offices").Error
 		if err != nil {
 			return &Company{}, err
 		}
