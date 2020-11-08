@@ -105,7 +105,7 @@ func (server *Server) UpdateOffice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	company := models.Company{}
-	officeCompany, err := company.FindCompanyByID(server.DB, office.CompanyID)
+	officeCompany, err := company.FindCompanyByID(server.DB, officeGotten.CompanyID)
 	if err != nil {
 		responses.ERROR(w, http.StatusNotFound, err)
 		return

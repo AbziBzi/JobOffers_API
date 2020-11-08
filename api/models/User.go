@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/abzibzi/jobOffers_API/api/models/enums"
 	"github.com/badoux/checkmail"
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
@@ -12,13 +13,13 @@ import (
 
 // User model structure
 type User struct {
-	ID       int    `gorm:"primary_key;auto_increment" json:"id"`
-	Name     string `gorm:"size:100;not null" json:"name"`
-	Surname  string `gorm:"size:100;not null" json:"surname"`
-	Email    string `gorm:"size:255;not null;unique" json:"email"`
-	Password string `gorm:"size:100;not null" json:"password"`
-	RoleID   int    `gorm:"not null" json:"role_id"`
-	Role     Role   `gorm:"foreignKey:RoleID" json:"role"`
+	ID       int        `gorm:"primary_key;auto_increment" json:"id"`
+	Name     string     `gorm:"size:100;not null" json:"name"`
+	Surname  string     `gorm:"size:100;not null" json:"surname"`
+	Email    string     `gorm:"size:255;not null;unique" json:"email"`
+	Password string     `gorm:"size:100;not null" json:"password"`
+	RoleID   int        `gorm:"not null" json:"role_id"`
+	Role     enums.Role `gorm:"foreignKey:RoleID" json:"role"`
 }
 
 // Hash method is hashing user password
@@ -51,7 +52,7 @@ func (u *User) Prepare() {
 	u.Name = strings.TrimSpace(u.Name)
 	u.Surname = strings.TrimSpace(u.Surname)
 	u.Email = strings.TrimSpace(u.Email)
-	u.Role = Role{}
+	u.Role = enums.Role{}
 }
 
 // Validate method checks given data
@@ -116,7 +117,7 @@ func (u *User) SaveUser(db *gorm.DB) (*User, error) {
 		return &User{}, err
 	}
 	if u.ID != 0 {
-		err = db.Debug().Model(&Role{}).Where("id = ?", u.RoleID).Take(&u.Role).Error
+		err = db.Debug().Model(&enums.Role{}).Where("id = ?", u.RoleID).Take(&u.Role).Error
 		if err != nil {
 			return &User{}, err
 		}
@@ -134,7 +135,7 @@ func (u *User) FindAllUsers(db *gorm.DB) (*[]User, error) {
 	}
 	if len(users) > 0 {
 		for i := range users {
-			err := db.Debug().Model(&Role{}).Where("id = ?", users[i].RoleID).Take(&users[i].Role).Error
+			err := db.Debug().Model(&enums.Role{}).Where("id = ?", users[i].RoleID).Take(&users[i].Role).Error
 			if err != nil {
 				return &[]User{}, err
 			}
@@ -154,7 +155,7 @@ func (u *User) FindUserByID(db *gorm.DB, id int) (*User, error) {
 		return &User{}, err
 	}
 	if u.ID != 0 {
-		err := db.Debug().Model(&Role{}).Where("id = ?", u.RoleID).Take(&u.Role).Error
+		err := db.Debug().Model(&enums.Role{}).Where("id = ?", u.RoleID).Take(&u.Role).Error
 		if err != nil {
 			return &User{}, err
 		}
@@ -180,7 +181,7 @@ func (u *User) UpdateUser(db *gorm.DB, id int) (*User, error) {
 		return &User{}, err
 	}
 	if u.ID != 0 {
-		err := db.Debug().Model(&Role{}).Where("id = ?", u.RoleID).Take(&u.Role).Error
+		err := db.Debug().Model(&enums.Role{}).Where("id = ?", u.RoleID).Take(&u.Role).Error
 		if err != nil {
 			return &User{}, err
 		}

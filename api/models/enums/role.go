@@ -1,4 +1,4 @@
-package models
+package enums
 
 // Role describes user role
 type Role struct {
