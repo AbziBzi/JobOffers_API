@@ -17,5 +17,5 @@
 # VSCode dependency
 /.vscode
 
-# DB connection config
+# DB connection config file
 .env
