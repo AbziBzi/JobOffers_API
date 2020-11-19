@@ -34,4 +34,22 @@ func (s *Server) initializeRoutes() {
 	s.Router.HandleFunc("/api/jobOffers/{id}", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareAuthentication(s.UpdateJobOffert))).Methods("PUT")
 	s.Router.HandleFunc("/api/jobOffers/{id}", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareAuthentication(s.DeleteJobOffert))).Methods("DELETE")
 
+	// Enums
+	// Role routes
+	s.Router.HandleFunc("/api/roles", middlewares.SetMiddlewareJSON(s.GetRoles)).Methods("GET")
+	s.Router.HandleFunc("/api/roles/{id}", middlewares.SetMiddlewareJSON(s.GetRole)).Methods("GET")
+	// JobExperience routes
+	s.Router.HandleFunc("/api/jobExperiences", middlewares.SetMiddlewareJSON(s.GetJobExperiences)).Methods("GET")
+	s.Router.HandleFunc("/api/jobExperiences/{id}", middlewares.SetMiddlewareJSON(s.GetJobExperience)).Methods("GET")
+	// ContractType routes
+	s.Router.HandleFunc("/api/contractTypes", middlewares.SetMiddlewareJSON(s.GetConntractTypes)).Methods("GET")
+	s.Router.HandleFunc("/api/contractTypes/{id}", middlewares.SetMiddlewareJSON(s.GetContractType)).Methods("GET")
+	// CompanyType routes
+	s.Router.HandleFunc("/api/companyTypes", middlewares.SetMiddlewareJSON(s.GetCompanyTypes)).Methods("GET")
+	s.Router.HandleFunc("/api/companyTypes/{id}", middlewares.SetMiddlewareJSON(s.GetCompanyType)).Methods("GET")
+
+	// Others
+	s.Router.HandleFunc("/api/users/{id}/applications", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareAuthentication(s.GetUserAppliedJobs))).Methods("GET")
+	s.Router.HandleFunc("/api/jobOffers/{id}/applications", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareAuthentication(s.GetJobAppliedUsers))).Methods("GET")
+	s.Router.HandleFunc("/api/applications", middlewares.SetMiddlewareJSON(middlewares.SetMiddlewareAuthentication(s.CreateApplication))).Methods("POST")
 }

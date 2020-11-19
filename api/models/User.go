@@ -13,13 +13,14 @@ import (
 
 // User model structure
 type User struct {
-	ID       int        `gorm:"primary_key;auto_increment" json:"id"`
-	Name     string     `gorm:"size:100;not null" json:"name"`
-	Surname  string     `gorm:"size:100;not null" json:"surname"`
-	Email    string     `gorm:"size:255;not null;unique" json:"email"`
-	Password string     `gorm:"size:100;not null" json:"password"`
-	RoleID   int        `gorm:"not null" json:"role_id"`
-	Role     enums.Role `gorm:"foreignKey:RoleID" json:"role"`
+	ID        int        `gorm:"primary_key;auto_increment" json:"id"`
+	Name      string     `gorm:"size:100;not null" json:"name"`
+	Surname   string     `gorm:"size:100;not null" json:"surname"`
+	Email     string     `gorm:"size:255;not null;unique" json:"email"`
+	Password  string     `gorm:"size:100;not null" json:"password"`
+	RoleID    int        `gorm:"not null" json:"role_id"`
+	Role      enums.Role `gorm:"foreignKey:RoleID" json:"role,omitempty"`
+	JobOffers []JobOffer `gorm:"many2many:applications" json:"-"`
 }
 
 // Hash method is hashing user password
@@ -53,6 +54,7 @@ func (u *User) Prepare() {
 	u.Surname = strings.TrimSpace(u.Surname)
 	u.Email = strings.TrimSpace(u.Email)
 	u.Role = enums.Role{}
+	// u.JobOffers = []JobOffer{}
 }
 
 // Validate method checks given data
@@ -200,4 +202,15 @@ func (u *User) DeleteUser(db *gorm.DB, id int) (int64, error) {
 		return 0, db.Error
 	}
 	return db.RowsAffected, nil
+}
+
+// FindUserAppliedJobs returns all jobs that user have applied
+func (u *User) FindUserAppliedJobs(db *gorm.DB) ([]JobOffer, error) {
+	var err error
+	jobs := []JobOffer{}
+	err = db.Debug().Model(&u).Related(&jobs, "JobOffers").Error
+	if err != nil {
+		return []JobOffer{}, err
+	}
+	return jobs, nil
 }

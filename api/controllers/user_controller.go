@@ -144,3 +144,34 @@ func (server *Server) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Entity", fmt.Sprintf("%d", id))
 	responses.JSON(w, http.StatusNoContent, "")
 }
+
+// GetUserAppliedJobs returns user applied jobs
+func (server *Server) GetUserAppliedJobs(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.ParseInt(vars["id"], 10, 32)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	tokenID, err := auth.ExtractTokenID(r)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
+		return
+	}
+	user := models.User{}
+	userGotten, err := user.FindUserByID(server.DB, int(id))
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, err)
+		return
+	}
+	if tokenID != userGotten.ID {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
+		return
+	}
+	appliedJobs, err := userGotten.FindUserAppliedJobs(server.DB)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, appliedJobs)
+}

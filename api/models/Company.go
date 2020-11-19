@@ -11,18 +11,17 @@ import (
 
 // Company structure
 type Company struct {
-	ID            int                `gorm:"primary_key;auto_increment" json:"id"`
-	Name          string             `gorm:"size:255;not null;unique" json:"name"`
-	Size          int                `gorm:"not null" json:"size"`
-	Industry      string             `gorm:"size:255; not null" json:"industry"`
-	Headquarters  string             `gorm:"size:255;not null" json:"headquarters"`
-	SocialMedia   pq.StringArray     `gorm:"type:text[]" json:"social_media"`
-	TypeID        int                `gorm:"not null" json:"typeID"`
-	Type          enums.CompanyType  `gorm:"foreignKey:TypeID" json:"company_type"`
-	Technologies  []enums.Technology `gorm:"many2many:company_technologies" json:"technologies"`
-	UserID        int                `gorm:"not null unique" json:"user_id"`
-	Administrator User               `gorm:"foreignKey:UserID" json:"company_administrator"`
-	Offices       []Office           `gorm:"foreignKey:CompanyID" json:"offices"`
+	ID            int               `gorm:"primary_key;auto_increment" json:"id"`
+	Name          string            `gorm:"size:255;not null;unique" json:"name"`
+	Size          int               `gorm:"not null" json:"size"`
+	Industry      string            `gorm:"size:255; not null" json:"industry"`
+	Headquarters  string            `gorm:"size:255;not null" json:"headquarters"`
+	SocialMedia   pq.StringArray    `gorm:"type:text[]" json:"social_media,omitempty"`
+	TypeID        int               `gorm:"not null" json:"typeID"`
+	Type          enums.CompanyType `gorm:"foreignKey:TypeID" json:"company_type,omitempty"`
+	UserID        int               `gorm:"not null;unique" json:"user_id"`
+	Administrator User              `gorm:"foreignKey:UserID" json:"company_administrator,omitempty"`
+	Offices       []Office          `gorm:"foreignKey:CompanyID" json:"offices,omitempty"`
 }
 
 // Prepare func removes all white space before saving
@@ -37,7 +36,6 @@ func (c *Company) Prepare() {
 	}
 	c.SocialMedia = socialMedia
 	c.Type = enums.CompanyType{}
-	c.Technologies = []enums.Technology{}
 	c.Administrator = User{}
 }
 
@@ -80,10 +78,6 @@ func (c *Company) SaveCompany(db *gorm.DB) (*Company, error) {
 		if err != nil {
 			return &Company{}, err
 		}
-		err = db.Debug().Model(&c).Related(&c.Technologies, "Technologies").Error
-		if err != nil {
-			return &Company{}, err
-		}
 		err = db.Debug().Model(&c).Related(&c.Offices, "Offices").Error
 		if err != nil {
 			return &Company{}, err
@@ -110,10 +104,6 @@ func (c *Company) FindAllCompanies(db *gorm.DB) (*[]Company, error) {
 			if err != nil {
 				return &[]Company{}, err
 			}
-			err = db.Debug().Model(&companies[i]).Related(&companies[i].Technologies, "Technologies").Error
-			if err != nil {
-				return &[]Company{}, err
-			}
 			err = db.Debug().Model(&companies[i]).Related(&companies[i].Offices, "Offices").Error
 			if err != nil {
 				return &[]Company{}, err
@@ -136,10 +126,6 @@ func (c *Company) FindCompanyByID(db *gorm.DB, id int) (*Company, error) {
 			return &Company{}, err
 		}
 		err = db.Debug().Model(&User{}).Where("id = ?", c.UserID).Take(&c.Administrator).Error
-		if err != nil {
-			return &Company{}, err
-		}
-		err = db.Debug().Model(&c).Related(&c.Technologies, "Technologies").Error
 		if err != nil {
 			return &Company{}, err
 		}
@@ -172,10 +158,6 @@ func (c *Company) UpdateCompany(db *gorm.DB) (*Company, error) {
 			return &Company{}, err
 		}
 		err = db.Debug().Model(&User{}).Where("id = ?", c.UserID).Take(&c.Administrator).Error
-		if err != nil {
-			return &Company{}, err
-		}
-		err = db.Debug().Model(&c).Related(&c.Technologies, "Technologies").Error
 		if err != nil {
 			return &Company{}, err
 		}

@@ -12,9 +12,9 @@ type Office struct {
 	ID         int    `gorm:"primary_key;auto_increment" json:"id"`
 	Country    string `gorm:"size:255;not null" json:"country"`
 	City       string `gorm:"size:255;not null" json:"city"`
-	ZipCode    string `gorm:"size:255" json:"zip_code"`
+	ZipCode    string `gorm:"size:255" json:"zip_code,omitempty"`
 	Street     string `gorm:"size:255;not null" json:"street"`
-	BuildingNr string `gorm:"size:255" json:"building_nr"`
+	BuildingNr string `gorm:"size:255" json:"building_nr,omitempty"`
 	CompanyID  int    `gorm:"not null; unique" json:"company_id"`
 }
 

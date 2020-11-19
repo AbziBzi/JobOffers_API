@@ -23,7 +23,7 @@ func (server *Server) GetJobOffert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	jobOffert := models.JobOffer{}
-	jobGotten, err := jobOffert.FindJobOffertByID(server.DB, int(id))
+	jobGotten, err := jobOffert.FindJobOfferByID(server.DB, int(id))
 	if err != nil {
 		responses.ERROR(w, http.StatusNotFound, err)
 		return
@@ -100,7 +100,7 @@ func (server *Server) UpdateJobOffert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	job := models.JobOffer{}
-	jobGotten, err := job.FindJobOffertByID(server.DB, int(jobID))
+	jobGotten, err := job.FindJobOfferByID(server.DB, int(jobID))
 	if err != nil {
 		responses.ERROR(w, http.StatusNotFound, errors.New("Job offert not found"))
 		return
@@ -159,7 +159,7 @@ func (server *Server) DeleteJobOffert(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	job := models.JobOffer{}
-	jobGotten, err := job.FindJobOffertByID(server.DB, int(jobID))
+	jobGotten, err := job.FindJobOfferByID(server.DB, int(jobID))
 	if err != nil {
 		responses.ERROR(w, http.StatusNotFound, errors.New("Job offert not found"))
 		return
@@ -181,4 +181,41 @@ func (server *Server) DeleteJobOffert(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Entity", fmt.Sprintf("%d", jobID))
 	responses.JSON(w, http.StatusNoContent, "")
+}
+
+// GetJobAppliedUsers returns user applied jobs
+func (server *Server) GetJobAppliedUsers(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.ParseInt(vars["id"], 10, 32)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+	userID, err := auth.ExtractTokenID(r)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
+		return
+	}
+	job := models.JobOffer{}
+	jobGotten, err := job.FindJobOfferByID(server.DB, int(id))
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, err)
+		return
+	}
+	company := models.Company{}
+	companyGotten, err := company.FindCompanyByID(server.DB, jobGotten.CompanyID)
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, err)
+		return
+	}
+	if userID != companyGotten.UserID {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("User has no permissions"))
+		return
+	}
+	appliedUsers, err := jobGotten.FindJobAppliedUsers(server.DB)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, appliedUsers)
 }

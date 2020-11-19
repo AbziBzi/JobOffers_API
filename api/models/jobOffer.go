@@ -11,19 +11,19 @@ import (
 
 // JobOffer structure
 type JobOffer struct {
-	ID                   int                           `gorm:"primary_key;auto_increment" json:"id"`
-	Name                 string                        `gorm:"size:255;not null" json:"name"`
-	Description          string                        `gorm:"not null" json:"description"`
-	SalaryMin            int                           `json:"salary_min"`
-	SalaryMax            int                           `json:"salary_max"`
-	ExperienceID         int                           `gorm:"not null" json:"experience_id"`
-	Experience           enums.JobExperience           `gorm:"foreignKey:ExperienceID" json:"experience"`
-	PublicationTime      time.Time                     `gorm:"default:CURRENT_TIMESTAMP" json:"publication_time"`
-	CompanyID            int                           `gorm:"not null" json:"company_id"`
-	Company              Company                       `gorm:"foreignKey:CompanyID" json:"company"`
-	ContractTypeID       int                           `gorm:"not null" json:"contract_type_id"`
-	ContractType         enums.CompanyType             `gorm:"foreignKey:ContractTypeID" json:"contract_type"`
-	ExpectedTechnologies []enums.ExpectedTechnologyDTO `gorm:"many2many:job_expected_technologies" json:"expected_technologies"`
+	ID              int                 `gorm:"primary_key;auto_increment" json:"id"`
+	Name            string              `gorm:"size:255;not null" json:"name"`
+	Description     string              `gorm:"not null" json:"description"`
+	SalaryMin       int                 `json:"salary_min,omitempty"`
+	SalaryMax       int                 `json:"salary_max,omitempty"`
+	ExperienceID    int                 `gorm:"not null" json:"experience_id"`
+	Experience      enums.JobExperience `gorm:"foreignKey:ExperienceID" json:"experience,omitempty"`
+	PublicationTime time.Time           `gorm:"default:CURRENT_TIMESTAMP" json:"publication_time"`
+	CompanyID       int                 `gorm:"not null" json:"company_id"`
+	Company         Company             `gorm:"foreignKey:CompanyID" json:"company,omitempty"`
+	ContractTypeID  int                 `gorm:"not null" json:"contract_type_id"`
+	ContractType    enums.CompanyType   `gorm:"foreignKey:ContractTypeID" json:"contract_type,omitempty"`
+	Users           []User              `gorm:"many2many:applications" json:"-"`
 }
 
 // Prepare func removes all white space before saving
@@ -33,7 +33,7 @@ func (j *JobOffer) Prepare() {
 	j.Description = strings.TrimSpace(j.Description)
 	j.PublicationTime = time.Now()
 	j.Company = Company{}
-	j.ExpectedTechnologies = []enums.ExpectedTechnologyDTO{}
+	j.Users = []User{}
 }
 
 // Validate func checks if given data is valid
@@ -88,10 +88,6 @@ func (j *JobOffer) SaveJobOffert(db *gorm.DB) (*JobOffer, error) {
 		if err != nil {
 			return &JobOffer{}, err
 		}
-		err = db.Debug().Model(&j).Related(&j.ExpectedTechnologies, "Technologies").Error
-		if err != nil {
-			return &JobOffer{}, err
-		}
 	}
 	return j, nil
 }
@@ -118,19 +114,17 @@ func (j *JobOffer) FindAllJobOffers(db *gorm.DB) (*[]JobOffer, error) {
 			if err != nil {
 				return &[]JobOffer{}, err
 			}
-			technology := enums.JobExpectedTechnology{}
-			technologies, err := technology.FindAllJobOfferTechnologies(db, jobs[i].ID)
+			err = db.Debug().Model(&jobs[i]).Related(&jobs[i].Users, "Users").Error
 			if err != nil {
 				return &[]JobOffer{}, err
 			}
-			jobs[i].ExpectedTechnologies = technologies
 		}
 	}
 	return &jobs, nil
 }
 
-// FindJobOffertByID func finds job offert by its ID in the BD
-func (j *JobOffer) FindJobOffertByID(db *gorm.DB, id int) (*JobOffer, error) {
+// FindJobOfferByID func finds job offert by its ID in the BD
+func (j *JobOffer) FindJobOfferByID(db *gorm.DB, id int) (*JobOffer, error) {
 	var err error
 	err = db.Debug().Model(&JobOffer{}).Where("id = ?", id).Take(&j).Error
 	if err != nil {
@@ -149,12 +143,10 @@ func (j *JobOffer) FindJobOffertByID(db *gorm.DB, id int) (*JobOffer, error) {
 		if err != nil {
 			return &JobOffer{}, err
 		}
-		technology := enums.JobExpectedTechnology{}
-		technologies, err := technology.FindAllJobOfferTechnologies(db, j.ID)
+		err = db.Debug().Model(&j).Related(&j.Users, "Users").Error
 		if err != nil {
 			return &JobOffer{}, err
 		}
-		j.ExpectedTechnologies = technologies
 	}
 	return j, nil
 }
@@ -187,12 +179,10 @@ func (j *JobOffer) UpdateJobOffert(db *gorm.DB) (*JobOffer, error) {
 		if err != nil {
 			return &JobOffer{}, err
 		}
-		technology := enums.JobExpectedTechnology{}
-		technologies, err := technology.FindAllJobOfferTechnologies(db, j.ID)
+		err = db.Debug().Model(&j).Related(&j.Users, "Users").Error
 		if err != nil {
 			return &JobOffer{}, err
 		}
-		j.ExpectedTechnologies = technologies
 	}
 	return j, nil
 }
@@ -207,4 +197,15 @@ func (j *JobOffer) DeleteJobOffert(db *gorm.DB, id int) (int64, error) {
 		return 0, db.Error
 	}
 	return db.RowsAffected, nil
+}
+
+// FindJobAppliedUsers returns all users that applied for this job
+func (j *JobOffer) FindJobAppliedUsers(db *gorm.DB) ([]User, error) {
+	var err error
+	users := []User{}
+	err = db.Debug().Model(&j).Related(&users, "Users").Error
+	if err != nil {
+		return []User{}, err
+	}
+	return users, nil
 }
