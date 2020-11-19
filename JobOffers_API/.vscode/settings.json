@@ -1,0 +1,14 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "3.124.191.230",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "AWS_DB",
+            "database": "jobsDB",
+            "username": "ubuntu",
+            "password": "root"
+        }
+    ]
+}
