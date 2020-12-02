@@ -15,14 +15,14 @@
 # vendor/
 
 # VSCode dependency
-*.vscode
+/.vscode
 
 # DB connection config file
 .env
 
 # dependencies
-*node_modules
-*.pnp
+/node_modules
+/.pnp
 .pnp.js
 
 # testing
