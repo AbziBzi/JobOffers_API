@@ -5,10 +5,11 @@ import App from './App';
 import SignInPage from './pages/SignInPage'
 import SignUpPage from './pages/SignUpPage'
 import reportWebVitals from './reportWebVitals';
+import CompanyList from './pages/CompanyList'
 
 ReactDOM.render(
   <React.StrictMode>
-    <SignUpPage />
+    <CompanyList />
   </React.StrictMode>,
   document.getElementById('root')
 );
