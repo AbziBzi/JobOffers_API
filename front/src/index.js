@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import SignInPage from './components/SignInPage'
-import SignUpPage from './components/SignUpPage'
+import SignInPage from './pages/SignInPage'
+import SignUpPage from './pages/SignUpPage'
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
