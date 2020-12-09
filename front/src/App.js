@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import JobOfferList from './components/JobOfferList';
+import JobOfferPage from './components/JobOfferPage';
 import CompaniesPage from './pages/CompaniesPage';
 import CompanyPage from './pages/CompanyPage';
 import NavBar from './components/NavBar'
@@ -14,6 +15,7 @@ function App() {
           <Route path="/companies" exact component={CompaniesPage} />
           <Route path="/companies/:id" exact component={CompanyPage} />
           <Route path="/jobs" exact component={JobOfferList} />
+          <Route path="/job" exact component={JobOfferPage} />
         </Switch>
       </BrowserRouter>
     </div>
