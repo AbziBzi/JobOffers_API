@@ -14,7 +14,7 @@ function CompanyCard(props) {
     const company = props.company
 
     const handleClick = () => {
-        console.log("clicked")
+        console.log("one day it will work and in this day you will know that every click you do...")
     }
     return (
         <Card>
