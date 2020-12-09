@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from 'react';
+import JobOfferCard from './JobOfferCard';
+import Box from '@material-ui/core/Box';
+import { makeStyles } from '@material-ui/core/styles';
 
-function JobOfferPage() {
+const useStyles = makeStyles(() => ({
+  jobOfferCard: {
+    marginTop: 10
+  }
+}));
+
+function JobOfferList() {
+    const classes = useStyles();
+
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [jobOffers, setJobOffers] = useState([]);
@@ -32,15 +43,19 @@ function JobOfferPage() {
     return <div>Loading...</div>;
     } else {
     return (
-        <ul>
+      <Box display="flex"
+           flexDirection="column">
         {jobOffers.map(item => (
-            <li key={item.id}>
-            {item.name} {item.description}
-            </li>
+          <div key={item.id}
+          className={classes.jobOfferCard}>
+            <JobOfferCard offer={item}
+                          company={item.company}
+                          experience={item.experience}/>
+          </div>
         ))}
-        </ul>
+      </Box>
     );
     }
 }
 
-export default JobOfferPage
+export default JobOfferList
