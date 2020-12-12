@@ -2,22 +2,13 @@ import React from 'react';
 import { BrowserRouter, Switch, Route, Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
-import AppBar from '@material-ui/core/AppBar';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import MailIcon from '@material-ui/icons/Mail';
 import DetailsIcon from '@material-ui/icons/Details'
 import HomeWorkIcon from '@material-ui/icons/HomeWork';
 import WorkOutlineIcon from '@material-ui/icons/WorkOutline';
-import SignInPage from './SignInPage'
-import CompaniesPage from './CompaniesPage';
 import CompanyDetails from '../components/CompanyDetails'
 import CompanyOffices from '../components/CompanyOffices'
 import CompanyJobs from '../components/CompanyJobs'
@@ -43,6 +34,9 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1,
         padding: theme.spacing(3),
     },
+    link: {
+        textDecoration: 'none'
+    }
 }));
 
 function CompanyPage(props) {
@@ -59,7 +53,7 @@ function CompanyPage(props) {
                     }}>
                     <div className={classes.drawerContainer}>
                         <List>
-                            <ListItem component={Link} to={`/companies/${company.id}`}>
+                            <ListItem className={classes.link} component={Link} to={`/companies/${company.id}`}>
                                 <ListItemIcon>
                                     <DetailsIcon />
                                 </ListItemIcon>
