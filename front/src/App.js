@@ -4,19 +4,26 @@ import JobOfferList from './components/JobOfferList';
 import CompaniesPage from './pages/CompaniesPage';
 import CompanyPage from './pages/CompanyPage';
 import NavBar from './components/NavBar'
+import Footer from './components/Footer'
+import './App.css';
 
 function App() {
   return (
-    <div>
-      <BrowserRouter>
+    <BrowserRouter>
+      <header>
         <NavBar />
+      </header>
+      <section>
         <Switch>
           <Route path="/companies" exact component={CompaniesPage} />
           <Route path="/companies/:id" exact component={CompanyPage} />
           <Route path="/jobs" exact component={JobOfferList} />
         </Switch>
-      </BrowserRouter>
-    </div>
+      </section>
+      <footer>
+        <Footer />
+      </footer>
+    </BrowserRouter>
   );
 }
 

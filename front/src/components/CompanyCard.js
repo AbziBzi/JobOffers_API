@@ -1,6 +1,5 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { red } from '@material-ui/core/colors';
 import {
     Grid,
     Card,
@@ -30,10 +29,6 @@ const useStyles = makeStyles(theme => ({
 function CompanyCard(props) {
     const classes = useStyles()
     const company = props.company
-
-    const handleClick = () => {
-        console.log("one day it will work and in this day you will know that every click you do...")
-    }
     return (
         <Link className={classes.link} to={{ pathname: `/companies/${company.id}`, state: { company: company } }} key={company.id}>
             <Card>

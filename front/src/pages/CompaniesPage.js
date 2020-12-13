@@ -2,10 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles'
 import {
     Grid,
-    Card,
-    CardContent,
-    Typography,
-    CardHeader,
     CircularProgress
 } from '@material-ui/core/'
 import CompanyCard from '../components/CompanyCard'
