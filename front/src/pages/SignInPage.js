@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -37,7 +37,35 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function SignInPage() {
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [responsee, setResponse] = useState("")
     const classes = useStyles();
+
+    const onLogin = () => {
+        const bodyJSON = JSON.stringify({ email: email, password: password })
+        fetch("http://localhost:3033/api/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json"
+            },
+            body: bodyJSON
+        })
+            .then(response => {
+                response.json()
+            })
+            .then(responseJSON => {
+                console.log(responseJSON)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }
+
+    const onShowToken = () => {
+        console.log(responsee)
+    }
 
     return (
         <Container component="main" maxWidth="xs">
@@ -49,7 +77,7 @@ function SignInPage() {
                 <Typography component="h1" variant="h5">
                     Sign in
                 </Typography>
-                <form className={classes.form} noValidate>
+                <form className={classes.form}>
                     <TextField
                         variant="outlined"
                         margin="normal"
@@ -60,6 +88,7 @@ function SignInPage() {
                         name="email"
                         autoComplete="email"
                         autoFocus
+                        onChange={e => setEmail(e.target.value)}
                     />
                     <TextField
                         variant="outlined"
@@ -71,27 +100,20 @@ function SignInPage() {
                         type="password"
                         id="password"
                         autoComplete="current-password"
+                        onChange={e => setPassword(e.target.value)}
                     />
-                    <FormControl variant="outlined" className={classes.formControl}>
-                        <InputLabel id="demo-simple-select-outlined-label">Role</InputLabel>
-                        <Select
-                            labelId="demo-simple-select-outlined-label"
-                            id="demo-simple-select-outlined"
-                            label="Role"
-                        >
-                            <MenuItem value="">
-                                <em>None</em>
-                            </MenuItem>
-                            <MenuItem value={1}>Developer</MenuItem>
-                            <MenuItem value={2}>Employer</MenuItem>
-                        </Select>
-                    </FormControl>
                     <Button
                         type="submit"
                         fullWidth
                         variant="contained"
                         color="primary"
                         className={classes.submit}
+                        onClick={onLogin}
+                    >
+                        Sign In
+                    </Button>
+                    <Button
+                        onClick={onShowToken}
                     >
                         Sign In
                     </Button>
@@ -109,3 +131,6 @@ function SignInPage() {
 }
 
 export default SignInPage
+
+
+	// log.Fatal(http.ListenAndServe(port, handlers.CORS(handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}), handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}), handlers.AllowedOrigins([]string{"*"}))(server.Router)))

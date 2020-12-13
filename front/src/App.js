@@ -4,6 +4,7 @@ import JobOfferList from './components/JobOfferList';
 import CompaniesPage from './pages/CompaniesPage';
 import CompanyPage from './pages/CompanyPage';
 import NavBar from './components/NavBar'
+import SignInPage from './pages/SignInPage'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/companies" exact component={CompaniesPage} />
           <Route path="/companies/:id" exact component={CompanyPage} />
           <Route path="/jobs" exact component={JobOfferList} />
+          <Route path="/login" exact component={SignInPage} />
         </Switch>
       </BrowserRouter>
     </div>

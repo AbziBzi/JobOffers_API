@@ -26,7 +26,7 @@ function CompaniesPage() {
     const [companies, setCompanies] = useState([]);
 
     useEffect(() => {
-        fetch("http://3.124.191.230:3030/api/companies", {
+        fetch("http://localhost:3033/api/companies", {
             method: 'GET',
             mode: 'cors',
             headers: {
