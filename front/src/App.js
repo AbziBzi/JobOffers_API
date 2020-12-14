@@ -4,12 +4,9 @@ import JobOfferList from './components/JobOfferList';
 import CompaniesPage from './pages/CompaniesPage';
 import CompanyPage from './pages/CompanyPage';
 import NavBar from './components/NavBar'
-<<<<<<< HEAD
 import SignInPage from './pages/SignInPage'
-=======
 import Footer from './components/Footer'
 import './App.css';
->>>>>>> 50c9f18760206096647de3977593ed3aae37e713
 
 function App() {
   return (
