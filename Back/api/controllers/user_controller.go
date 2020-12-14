@@ -43,6 +43,22 @@ func (server *Server) GetUser(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, userGotten)
 }
 
+// GetUserByToken returns User data by his token
+func (server *Server) GetUserByToken(w http.ResponseWriter, r *http.Request) {
+	uid, err := auth.ExtractTokenID(r)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
+		return
+	}
+	user := models.User{}
+	userGotten, err := user.FindUserByID(server.DB, int(uid))
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, userGotten)
+}
+
 // CreateUser adds new user to DB
 func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)

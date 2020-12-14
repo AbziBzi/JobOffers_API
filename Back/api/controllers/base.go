@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/abzibzi/jobOffers_API/api/models"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" //postgres
@@ -39,5 +40,8 @@ func (server *Server) Initialize(DbHost, DbPort, DbUser, DbName, DbPassword stri
 // RunServer runs server on given port
 func (server *Server) RunServer(port string) {
 	log.Printf("\nServer starting on port %s", port)
-	log.Fatal(http.ListenAndServe(port, server.Router))
+	log.Fatal(http.ListenAndServe(port, handlers.CORS(
+		handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),
+		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}),
+		handlers.AllowedOrigins([]string{"*"}))(server.Router)))
 }

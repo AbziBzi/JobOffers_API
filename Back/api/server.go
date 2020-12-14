@@ -22,6 +22,6 @@ func Run() {
 	}
 	server.Initialize(os.Getenv("DB_HOST"), os.Getenv("DB_PORT"),
 		os.Getenv("DB_USER"), os.Getenv("DB_NAME"), os.Getenv("DB_PASSWORD"))
-	server.RunServer(":3030")
+	server.RunServer(":3033")
 
 }
