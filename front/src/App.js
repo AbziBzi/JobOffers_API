@@ -7,24 +7,35 @@ import NavBar from './components/NavBar'
 import SignInPage from './pages/SignInPage'
 import Footer from './components/Footer'
 import './App.css';
+import {createMuiTheme, Typography, ThemeProvider} from '@material-ui/core'
+
+const theme = createMuiTheme({
+  typography: {
+    fontFamily: [
+      'Heebo',
+      'serif',
+    ].join(','),
+},});
 
 function App() {
   return (
     <BrowserRouter>
-      <header>
-        <NavBar />
-      </header>
-      <section>
-        <Switch>
-          <Route path="/companies" exact component={CompaniesPage} />
-          <Route path="/companies/:id" exact component={CompanyPage} />
-          <Route path="/jobs" exact component={JobOfferList} />
-          <Route path="/login" exact component={SignInPage} />
-        </Switch>
-      </section>
-      <footer>
-        <Footer />
-      </footer>
+      <ThemeProvider theme={theme}>
+        <header>
+          <NavBar />
+        </header>
+        <section>
+          <Switch>
+            <Route path="/companies" exact component={CompaniesPage} />
+            <Route path="/companies/:id" exact component={CompanyPage} />
+            <Route path="/jobs" exact component={JobOfferList} />
+            <Route path="/login" exact component={SignInPage} />
+          </Switch>
+        </section>
+        <footer>
+          <Footer />
+        </footer>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }
