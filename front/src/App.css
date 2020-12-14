@@ -1,7 +1,7 @@
-.App {
-  text-align: center;
+section {
+  flex: 1 0 auto;
 }
 
-.Container {
-  background-color: aqua;
+footer {
+  flex-shrink: 0;
 }
