@@ -5,6 +5,7 @@ import CompaniesPage from './pages/CompaniesPage';
 import CompanyPage from './pages/CompanyPage';
 import NavBar from './components/NavBar'
 import SignInPage from './pages/SignInPage'
+import SignUpPage from './pages/SignUpPage'
 import Footer from './components/Footer'
 import './App.css';
 
@@ -20,6 +21,7 @@ function App() {
           <Route path="/companies/:id" exact component={CompanyPage} />
           <Route path="/jobs" exact component={JobOfferList} />
           <Route path="/login" exact component={SignInPage} />
+          <Route path="/register" exact component={SignUpPage} />
         </Switch>
       </section>
       <footer>

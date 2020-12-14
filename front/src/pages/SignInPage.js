@@ -1,11 +1,8 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useState, useContext } from 'react';
+import { useHistory } from "react-router-dom";
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import InputLabel from "@material-ui/core/InputLabel";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -44,7 +41,7 @@ function SignInPage() {
     const [token, setToken] = useState("")
     const classes = useStyles();
     const user = useContext(UserContext)
-
+    const history = useHistory();
     const onLogin = () => {
         const bodyJSON = JSON.stringify({ email: email, password: password })
         fetch("http://localhost:3033/api/login", {
@@ -75,6 +72,7 @@ function SignInPage() {
                 user.setId(jsonResponse.id)
                 user.setRoleId(jsonResponse.role_id)
                 console.log(user)
+                history.push('/jobs')
             })
             .catch(error => console.log(error))
     }
@@ -125,7 +123,7 @@ function SignInPage() {
                     </Button>
                 <Grid container>
                     <Grid item>
-                        <Link href="/signup" variant="body2">
+                        <Link href="/register" variant="body2">
                             {"Don't have an account? Sign Up"}
                         </Link>
                     </Grid>

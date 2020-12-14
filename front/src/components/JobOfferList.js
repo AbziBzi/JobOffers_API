@@ -11,14 +11,14 @@ const useStyles = makeStyles(() => ({
 }));
 
 function JobOfferList() {
-    const classes = useStyles();
+  const classes = useStyles();
 
-    const [error, setError] = useState(null);
-    const [isLoaded, setIsLoaded] = useState(false);
-    const [jobOffers, setJobOffers] = useState([]);
+  const [error, setError] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [jobOffers, setJobOffers] = useState([]);
 
   useEffect(() => {
-    fetch("http://3.124.191.230:3030/api/jobOffers", {
+    fetch("http://localhost:3033/api/jobOffers", {
       method: 'GET',
       mode: 'cors',
       headers: {
@@ -46,13 +46,13 @@ function JobOfferList() {
     return (
       <Container maxWidth="md">
         <Box display="flex"
-            flexDirection="column">
+          flexDirection="column">
           {jobOffers.map(item => (
             <div key={item.id}
-            className={classes.jobOfferCard}>
+              className={classes.jobOfferCard}>
               <JobOfferCard offer={item}
-                            company={item.company}
-                            experience={item.experience}/>
+                company={item.company}
+                experience={item.experience} />
             </div>
           ))}
         </Box>
