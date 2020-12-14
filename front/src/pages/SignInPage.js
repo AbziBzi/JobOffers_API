@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -11,6 +11,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import { UserContext } from '../UserContext';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -36,11 +37,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+
 function SignInPage() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-    const [responsee, setResponse] = useState("")
+    const [token, setToken] = useState("")
     const classes = useStyles();
+    const user = useContext(UserContext)
 
     const onLogin = () => {
         const bodyJSON = JSON.stringify({ email: email, password: password })
@@ -51,20 +54,29 @@ function SignInPage() {
                 Accept: "application/json"
             },
             body: bodyJSON
-        })
-            .then(response => {
-                response.json()
+        }).then(response => response.json())
+            .then(jsonResponse => {
+                setToken(jsonResponse)
+                onGetUserData()
             })
-            .then(responseJSON => {
-                console.log(responseJSON)
-            })
-            .catch(error => {
-                console.log(error)
-            })
+            .catch(error => console.log(error))
     }
 
-    const onShowToken = () => {
-        console.log(responsee)
+    const onGetUserData = () => {
+        fetch("http://localhost:3033/api/users/token", {
+            method: "GET",
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
+        }).then(response => response.json())
+            .then(jsonResponse => {
+                user.setToken(token)
+                user.setId(jsonResponse.id)
+                user.setRoleId(jsonResponse.role_id)
+                console.log(user)
+            })
+            .catch(error => console.log(error))
     }
 
     return (
@@ -77,60 +89,50 @@ function SignInPage() {
                 <Typography component="h1" variant="h5">
                     Sign in
                 </Typography>
-                <form className={classes.form}>
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="email"
-                        label="Email Address"
-                        name="email"
-                        autoComplete="email"
-                        autoFocus
-                        onChange={e => setEmail(e.target.value)}
-                    />
-                    <TextField
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="password"
-                        label="Password"
-                        type="password"
-                        id="password"
-                        autoComplete="current-password"
-                        onChange={e => setPassword(e.target.value)}
-                    />
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        className={classes.submit}
-                        onClick={onLogin}
-                    >
-                        Sign In
+                <TextField
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
+                    id="email"
+                    label="Email Address"
+                    name="email"
+                    autoComplete="email"
+                    autoFocus
+                    onChange={e => setEmail(e.target.value)}
+                />
+                <TextField
+                    variant="outlined"
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Password"
+                    type="password"
+                    id="password"
+                    autoComplete="current-password"
+                    onChange={e => setPassword(e.target.value)}
+                />
+                <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    className={classes.submit}
+                    onClick={onLogin}
+                >
+                    Sign In
                     </Button>
-                    <Button
-                        onClick={onShowToken}
-                    >
-                        Sign In
-                    </Button>
-                    <Grid container>
-                        <Grid item>
-                            <Link href="/signuppage" variant="body2">
-                                {"Don't have an account? Sign Up"}
-                            </Link>
-                        </Grid>
+                <Grid container>
+                    <Grid item>
+                        <Link href="/signup" variant="body2">
+                            {"Don't have an account? Sign Up"}
+                        </Link>
                     </Grid>
-                </form>
+                </Grid>
             </div>
         </Container>
     );
 }
 
 export default SignInPage
-
-
-	// log.Fatal(http.ListenAndServe(port, handlers.CORS(handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}), handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS"}), handlers.AllowedOrigins([]string{"*"}))(server.Router)))
