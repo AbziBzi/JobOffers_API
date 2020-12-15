@@ -25,15 +25,45 @@ export default function SimpleTabs() {
         setValue(newValue);
     };
 
-    return (
-        <div className={classes.root}>
-            <AppBar position="static">
-                <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
-                    <Tab label="Profile" href="/login" />
-                    <Tab label="Open Jobs" />
-                    <Tab label="" />
-                </Tabs>
-            </AppBar>
-        </div>
-    );
+    if (user.roleId == 1) {
+        return (
+            <div className={classes.root}>
+                <AppBar position="static">
+                    <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
+                        <Tab label="Open Jobs" href="/jobs" />
+                        <Tab label="Companies" href="/companies" />
+                        <Tab label="Log Out" />
+                    </Tabs>
+                </AppBar>
+            </div>
+        );
+    }
+    else if (user.role == 2) {
+        return (
+            <div className={classes.root}>
+                <AppBar position="static">
+                    <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
+                        <Tab label="Open Jobs" href="/jobs" />
+                        <Tab label="Companies" href="/companies" />
+                        <Tab label="Add Job Offer" />
+                        <Tab label="Log Out" />
+                    </Tabs>
+                </AppBar>
+            </div>
+        );
+    }
+    else {
+        return (
+            <div className={classes.root}>
+                <AppBar position="static">
+                    <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
+                        <Tab label="Open Jobs" href="/jobs" />
+                        <Tab label="Companies" href="/companies" />
+                        <Tab label="Sign In" href="/login" />
+                        <Tab label="Sign Up" href="/signup" />
+                    </Tabs>
+                </AppBar>
+            </div>
+        );
+    }
 }

@@ -29,11 +29,13 @@ function App() {
         </header>
         <section>
           <Switch>
+            <Route exact path="/" exact component={JobOfferList} />
             <Route path="/companies" exact component={CompaniesPage} />
             <Route path="/companies/:id" exact component={CompanyPage} />
             <Route path="/jobs" exact component={JobOfferList} />
             <Route path="/jobs/:id" exact component={JobOfferPage} />
             <Route path="/login" exact component={SignInPage} />
+            <Route path="/signup" exact component={SignUpPage} />
           </Switch>
           {/* <JobOfferPage /> */}
         </section>
