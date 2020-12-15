@@ -57,12 +57,8 @@ function JobOfferList() {
     return (
       <Container maxWidth="md">
         <Box display="flex"
-<<<<<<< HEAD
-          flexDirection="column">
-=======
-             flexDirection="column"
-             mb={1}>
->>>>>>> 205ed382dc5978fd8ac697a691cfb15dd3b3ad52
+          flexDirection="column"
+          mb={1}>
           {jobOffers.map(item => (
             <div key={item.id}
               className={classes.jobOfferCard}>
