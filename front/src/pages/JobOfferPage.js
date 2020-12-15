@@ -1,21 +1,47 @@
-import React from 'react'
-import {Grid, Paper, Container, Card, Typography, Box, Button} from '@material-ui/core'
+import React, { useEffect, useState } from 'react';
+import { Grid, Paper, Container, Card, Typography, Box, Button, CircularProgress } from '@material-ui/core'
 import Business from '@material-ui/icons/Business';
 import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import EuroIcon from '@material-ui/icons/Euro';
 import Send from '@material-ui/icons/Send';
 import { makeStyles } from '@material-ui/core/styles';
-import {Dialog, DialogActions, DialogContent, DialogTitle, TextField} from '@material-ui/core';
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@material-ui/core';
 
 const useStyles = makeStyles(() => ({
     paperPadding: {
-      paddingTop: 20,
-      paddingBottom: 20
+        paddingTop: 20,
+        paddingBottom: 20
     }
-  }));
+}));
 
 function JobOfferPage(props) {
     const classes = useStyles();
+    const jobID = props.match.params.id
+    const [error, setError] = useState(null);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [job, setJob] = useState([]);
+
+    useEffect(() => {
+        fetch(`http://localhost:3033/api/jobOffers/${jobID}`, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    setJob(result);
+                    if (result.error != null) {
+                        setError(result.error);
+                        console.log(result)
+                        setIsLoaded(true);
+                    }
+                    setIsLoaded(true);
+                }
+            )
+    }, [])
 
     const [open, setOpen] = React.useState(false);
 
@@ -27,108 +53,117 @@ function JobOfferPage(props) {
         setOpen(false);
     };
 
-    const offer = props.location.state.offer;
-    const company = props.location.state.company;
-    const experience = props.location.state.experience;
-    return (
-        <Container maxWidth="md">
-            <Box className={classes.paperPadding}>
-                <Paper>
-                    <Box p={5}>
-                        <Grid container 
+    if (error != null) {
+        return <div>Error: {error}</div>;
+    } else if (!isLoaded) {
+        return (
+            <div className={classes.spinner}>
+                <CircularProgress size={100} />
+            </div>
+        )
+    } else {
+        const offer = job;
+        const company = job.company;
+        const experience = job.experience;
+        return (
+            <Container maxWidth="md">
+                <Box className={classes.paperPadding}>
+                    <Paper>
+                        <Box p={5}>
+                            <Grid container
                                 spacing={3}
                                 justify="space-between">
-                            <Grid item xs={12}>
-                            <Card>
-                                <Box p={1}>
-                                    <Typography variant="h2" color="primary"> 
-                                        {offer.name}
-                                    </Typography>
-                                </Box>
-                            </Card>
-                            </Grid>
-                            <Grid item xs={4}>
-                                <Card>
-                                    <Box p={1}
-                                        display="flex"
-                                        flexDirection="column"
-                                        justifyContent="space-evenly"
-                                        alignItems="center">
-                                        <Business fontSize="small"
-                                                color="disabled"/>
-                                        <Typography variant="h6"> 
-                                            {company.name} | {company.headquarters}
+                                <Grid item xs={12}>
+                                    <Card>
+                                        <Box p={1}>
+                                            <Typography variant="h2" color="primary">
+                                                {job.name}
+                                            </Typography>
+                                        </Box>
+                                    </Card>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <Card>
+                                        <Box p={1}
+                                            display="flex"
+                                            flexDirection="column"
+                                            justifyContent="space-evenly"
+                                            alignItems="center">
+                                            <Business fontSize="small"
+                                                color="disabled" />
+                                            <Typography variant="h6">
+                                                {job.company.name} | {job.company.headquarters}
+                                            </Typography>
+                                            <Typography variant="subtitle2">
+                                                Company | Location
                                         </Typography>
-                                        <Typography variant="subtitle2">
-                                            Company | Location
+                                        </Box>
+                                    </Card>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <Card>
+                                        <Box p={1}
+                                            display="flex"
+                                            flexDirection="column"
+                                            justifyContent="space-evenly"
+                                            alignItems="center">
+                                            <TrendingUpIcon fontSize="small"
+                                                color="disabled" />
+                                            <Typography variant="h6"
+                                                align="center">
+                                                {job.experience.name}
+                                            </Typography>
+                                            <Typography variant="subtitle2">
+                                                Experience
                                         </Typography>
-                                    </Box>
-                                </Card>
-                            </Grid>
-                            <Grid item xs={4}>
-                                <Card>
-                                    <Box p={1}
-                                        display="flex"
-                                        flexDirection="column"
-                                        justifyContent="space-evenly"
-                                        alignItems="center">
-                                        <TrendingUpIcon fontSize="small"
-                                                        color="disabled"/>
-                                        <Typography variant="h6"
-                                                    align="center"> 
-                                            {experience.name}
+                                        </Box>
+                                    </Card>
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <Card>
+                                        <Box p={1}
+                                            display="flex"
+                                            flexDirection="column"
+                                            justifyContent="space-evenly"
+                                            alignItems="center">
+                                            <EuroIcon fontSize="small"
+                                                color="disabled" />
+                                            <Typography variant="h6"
+                                                align="center"
+                                                color="secondary">
+                                                {job.salary_min} - {job.salary_max} €
                                         </Typography>
-                                        <Typography variant="subtitle2">
-                                            Experience
+                                            <Typography variant="subtitle2">
+                                                Salary
                                         </Typography>
-                                    </Box>
-                                </Card>
-                            </Grid>
-                            <Grid item xs={4}>
-                                <Card>
-                                    <Box p={1}
-                                         display="flex"
-                                         flexDirection="column"
-                                         justifyContent="space-evenly"
-                                         alignItems="center">
-                                        <EuroIcon fontSize="small"
-                                                  color="disabled"/>
-                                        <Typography variant="h6"
-                                                    align="center"
-                                                    color="secondary"> 
-                                            {offer.salary_min} - {offer.salary_max} €
+                                        </Box>
+                                    </Card>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Card>
+                                        <Box p={1}>
+                                            <Typography variant="h4">
+                                                Description
                                         </Typography>
-                                        <Typography variant="subtitle2">
-                                            Salary
-                                        </Typography>
-                                    </Box>
-                                </Card>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Card>
-                                    <Box p={1}>
-                                        <Typography variant="h4">
-                                            Description
-                                        </Typography>
-                                        <hr></hr>
-                                        <Typography variant="h6"> 
-                                            {offer.description}
-                                        </Typography>
-                                    </Box>
-                                </Card>
-                            </Grid>
-                            <Grid item xs={10}>
-                            </Grid>
-                            <Grid item xs={2}>
-                                <Button variant="contained" 
+                                            <hr></hr>
+                                            <Typography variant="h6">
+                                                {job.description}
+                                            </Typography>
+                                        </Box>
+                                    </Card>
+                                </Grid>
+                                <Grid item xs={10}>
+                                </Grid>
+                                <Grid item xs={2}>
+                                    <Button variant="contained"
                                         color="secondary"
                                         size="large"
-                                        endIcon={<Send/>}
+                                        endIcon={<Send />}
                                         onClick={handleClickOpen}>
-                                    Apply
+                                        Apply
                                 </Button>
-                                <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-                                    <DialogTitle id="form-dialog-title">Apply</DialogTitle>
+                                    <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+                                        <DialogTitle id="form-dialog-title">Apply</DialogTitle>
                                         <DialogContent>
                                             <Grid container spacing={2}>
                                                 <Grid item xs={6}>
@@ -171,30 +206,31 @@ function JobOfferPage(props) {
                                                 </Grid>
                                                 <Grid item xs={12}>
                                                     <Button variant="contained"
-                                                            component="label">
+                                                        component="label">
                                                         Upload CV
                                                         <input type="file"
-                                                               hidden/>
+                                                            hidden />
                                                     </Button>
                                                 </Grid>
                                             </Grid>
                                         </DialogContent>
-                                    <DialogActions>
-                                        <Button onClick={handleClose} color="primary">
-                                            Cancel
+                                        <DialogActions>
+                                            <Button onClick={handleClose} color="primary">
+                                                Cancel
                                         </Button>
-                                        <Button onClick={handleClose} color="primary">
-                                            Send
+                                            <Button onClick={handleClose} color="primary">
+                                                Send
                                         </Button>
-                                    </DialogActions>
-                                </Dialog>
+                                        </DialogActions>
+                                    </Dialog>
+                                </Grid>
                             </Grid>
-                        </Grid>
-                    </Box>
-                </Paper>
-            </Box>
-        </Container>
-    )
+                        </Box>
+                    </Paper>
+                </Box>
+            </Container>
+        )
+    }
 }
 
 export default JobOfferPage;
