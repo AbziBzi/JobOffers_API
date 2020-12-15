@@ -39,7 +39,10 @@
 *.env.production.local
 *.eslintcache
 front/.eslintcache
+front/.eslintcache
 /.eslintcache
 *npm-debug.log*
 *yarn-debug.log*
 *yarn-error.log*
+.eslintcache
+./.eslintcache
