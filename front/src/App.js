@@ -7,7 +7,8 @@ import NavBar from './components/NavBar'
 import SignInPage from './pages/SignInPage'
 import Footer from './components/Footer'
 import './App.css';
-import {createMuiTheme, Typography, ThemeProvider} from '@material-ui/core'
+import {createMuiTheme, ThemeProvider} from '@material-ui/core'
+import JobOfferPage from './pages/JobOfferPage'
 
 const theme = createMuiTheme({
   typography: {
@@ -29,8 +30,10 @@ function App() {
             <Route path="/companies" exact component={CompaniesPage} />
             <Route path="/companies/:id" exact component={CompanyPage} />
             <Route path="/jobs" exact component={JobOfferList} />
+            <Route path="/jobs/:id" exact component={JobOfferPage} />
             <Route path="/login" exact component={SignInPage} />
           </Switch>
+          {/* <JobOfferPage /> */}
         </section>
         <footer>
           <Footer />
