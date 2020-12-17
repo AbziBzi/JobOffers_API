@@ -39,11 +39,15 @@ function SignInPage() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [token, setToken] = useState("")
+    const [isLogged, setLogged] = useState(false)
+    const [error, setError] = useState("")
     const classes = useStyles();
     const user = useContext(UserContext)
     const history = useHistory();
+
     const onLogin = () => {
         const bodyJSON = JSON.stringify({ email: email, password: password })
+        setLogged(false)
         fetch("http://localhost:3033/api/login", {
             method: "POST",
             headers: {
@@ -54,27 +58,37 @@ function SignInPage() {
         }).then(response => response.json())
             .then(jsonResponse => {
                 setToken(jsonResponse)
-                onGetUserData()
+                if (jsonResponse.error != null) {
+                    setError(jsonResponse.error);
+                    console.log(jsonResponse)
+                }
+                setLogged(true)
             })
+            .then(onGetUserData())
             .catch(error => console.log(error))
     }
 
-    const onGetUserData = () => {
-        fetch("http://localhost:3033/api/users/token", {
-            method: "GET",
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json'
-            }
-        }).then(response => response.json())
-            .then(jsonResponse => {
-                user.setToken(token)
-                user.setId(jsonResponse.id)
-                user.setRoleId(jsonResponse.role_id)
-                console.log(user)
-                history.push('/jobs')
-            })
-            .catch(error => console.log(error))
+    const z = () => {
+        if (isLogged == true) {
+            fetch("http://localhost:3033/api/users/token", {
+                method: "GET",
+                mode: 'cors',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => response.json())
+                .then(jsonResponse => {
+                    user.setToken(token)
+                    user.setId(jsonResponse.id)
+                    user.setRoleId(jsonResponse.role_id)
+                    console.log(user)
+                    history.push('/jobs')
+                })
+                .catch(error => console.log(error))
+        } else {
+            console.log("Wrong email or password")
+        }
     }
 
     return (
@@ -87,6 +101,9 @@ function SignInPage() {
                 <Typography component="h1" variant="h5">
                     Sign in
                 </Typography>
+                {(error == null) && <Typography component="h1" variant="h6" color="error">
+                    Wrong email or password.
+                </Typography>}
                 <TextField
                     variant="outlined"
                     margin="normal"

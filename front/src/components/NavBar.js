@@ -26,6 +26,7 @@ export default function SimpleTabs() {
     };
 
     if (user.roleId == 1) {
+        console.log(user.roleId)
         return (
             <div className={classes.root}>
                 <AppBar position="static">
@@ -39,6 +40,7 @@ export default function SimpleTabs() {
         );
     }
     else if (user.role == 2) {
+        console.log(user.roleId)
         return (
             <div className={classes.root}>
                 <AppBar position="static">
@@ -53,6 +55,7 @@ export default function SimpleTabs() {
         );
     }
     else {
+        console.log(user.roleId)
         return (
             <div className={classes.root}>
                 <AppBar position="static">
