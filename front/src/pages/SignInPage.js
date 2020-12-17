@@ -39,16 +39,15 @@ function SignInPage() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [token, setToken] = useState("")
-    const [isLogged, setLogged] = useState(false)
+    const [errorResponse, setErrorResponse] = useState("")
     const [error, setError] = useState("")
     const classes = useStyles();
     const user = useContext(UserContext)
     const history = useHistory();
 
-    const onLogin = () => {
+    async function onLogin() {
         const bodyJSON = JSON.stringify({ email: email, password: password })
-        setLogged(false)
-        fetch("http://localhost:3033/api/login", {
+        await fetch("http://localhost:3033/api/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -57,20 +56,20 @@ function SignInPage() {
             body: bodyJSON
         }).then(response => response.json())
             .then(jsonResponse => {
-                setToken(jsonResponse)
                 if (jsonResponse.error != null) {
-                    setError(jsonResponse.error);
-                    console.log(jsonResponse)
+                    setErrorResponse(jsonResponse.error)
+                    console.log(jsonResponse.error)
+                } else {
+                    setToken(jsonResponse)
+                    onGetUserData()
                 }
-                setLogged(true)
             })
-            .then(onGetUserData())
             .catch(error => console.log(error))
     }
 
-    const z = () => {
-        if (isLogged == true) {
-            fetch("http://localhost:3033/api/users/token", {
+    async function onGetUserData() {
+        if (token != "") {
+            await fetch("http://localhost:3033/api/users/token", {
                 method: "GET",
                 mode: 'cors',
                 headers: {
@@ -82,12 +81,10 @@ function SignInPage() {
                     user.setToken(token)
                     user.setId(jsonResponse.id)
                     user.setRoleId(jsonResponse.role_id)
-                    console.log(user)
+                    console.log(jsonResponse)
                     history.push('/jobs')
                 })
                 .catch(error => console.log(error))
-        } else {
-            console.log("Wrong email or password")
         }
     }
 
@@ -101,8 +98,8 @@ function SignInPage() {
                 <Typography component="h1" variant="h5">
                     Sign in
                 </Typography>
-                {(error == null) && <Typography component="h1" variant="h6" color="error">
-                    Wrong email or password.
+                {(errorResponse != "") && <Typography component="h1" variant="h6" color="error">
+                    {(errorResponse != "Invalid Email" && errorResponse != "Required Password") ? "User with given credentials not found" : errorResponse}
                 </Typography>}
                 <TextField
                     variant="outlined"
